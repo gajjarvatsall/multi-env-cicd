@@ -1,0 +1,33 @@
+{
+  "name": "my-app-cicd",
+  "version": "1.0.0",
+  "description": "Sample app for CI/CD pipeline",
+  "homepage": "https://github.com/gajjarvatsall/multi-env-cicd#readme",
+  "bugs": {
+    "url": "https://github.com/gajjarvatsall/multi-env-cicd/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gajjarvatsall/multi-env-cicd.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "jest",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
