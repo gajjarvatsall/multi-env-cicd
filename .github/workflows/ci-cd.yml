@@ -105,7 +105,7 @@ jobs:
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
-        repository: gajjarvatsall/my-app-gitops
+        repository: gajjarvatsall/multi-env-gitops 
         token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
@@ -141,7 +141,7 @@ jobs:
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
-        repository: gajjarvatsall/my-app-gitops
+        repository: gajjarvatsall/multi-env-gitops 
         token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
@@ -177,7 +177,7 @@ jobs:
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
-        repository: gajjarvatsall/my-app-gitops
+        repository: gajjarvatsall/multi-env-gitops 
         token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
