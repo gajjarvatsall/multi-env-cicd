@@ -8,7 +8,6 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
@@ -74,7 +73,7 @@ jobs:
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.repository_owner }}/multi-env-gitops
+        repository: gajjarvatsall/multi-env-gitops
         token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
@@ -84,8 +83,12 @@ jobs:
         echo "Current dev values:"
         cat environments/dev/values.yaml
         
+        # Extract just the image tag from the full output
+        IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
+        echo "Using image tag: $IMAGE_TAG"
+        
         # Update image tag in dev environment
-        sed -i "s|image: .*|image: ${{ needs.build.outputs.image-tag }}|" environments/dev/values.yaml
+        sed -i "s|image: .*|image: $IMAGE_TAG|" environments/dev/values.yaml
         
         echo "Updated dev values:"
         cat environments/dev/values.yaml
@@ -94,7 +97,7 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add .
-        git commit -m "Update dev environment to ${{ needs.build.outputs.image-tag }}" || echo "No changes to commit"
+        git commit -m "Update dev environment to $IMAGE_TAG" || echo "No changes to commit"
         git push
 
   deploy-staging:
@@ -105,7 +108,7 @@ jobs:
     - name: Checkout GitOps repo
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.repository_owner }}/multi-env-gitops
+        repository: gajjarvatsall/multi-env-gitops
         token: ${{ secrets.GITOPS_TOKEN }}
         path: gitops
 
@@ -115,8 +118,12 @@ jobs:
         echo "Current staging values:"
         cat environments/staging/values.yaml
         
+        # Extract just the image tag from the full output
+        IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
+        echo "Using image tag: $IMAGE_TAG"
+        
         # Update image tag in staging environment
-        sed -i "s|image: .*|image: ${{ needs.build.outputs.image-tag }}|" environments/staging/values.yaml
+        sed -i "s|image: .*|image: $IMAGE_TAG|" environments/staging/values.yaml
         
         echo "Updated staging values:"
         cat environments/staging/values.yaml
@@ -125,37 +132,5 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add .
-        git commit -m "Update staging environment to ${{ needs.build.outputs.image-tag }}" || echo "No changes to commit"
-        git push
-
-  deploy-prod:
-    needs: [build, deploy-staging]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    steps:
-    - name: Checkout GitOps repo
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository_owner }}/multi-env-gitops
-        token: ${{ secrets.GITOPS_TOKEN }}
-        path: gitops
-
-    - name: Update production environment
-      run: |
-        cd gitops
-        echo "Current prod values:"
-        cat environments/prod/values.yaml
-        
-        # Update image tag in production environment
-        sed -i "s|image: .*|image: ${{ needs.build.outputs.image-tag }}|" environments/prod/values.yaml
-        
-        echo "Updated prod values:"
-        cat environments/prod/values.yaml
-        
-        # Commit changes
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Update production environment to ${{ needs.build.outputs.image-tag }}" || echo "No changes to commit"
+        git commit -m "Update staging environment to $IMAGE_TAG" || echo "No changes to commit"
         git push
