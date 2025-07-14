@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   REGISTRY: docker.io
@@ -13,20 +13,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
   build:
     needs: test
@@ -35,102 +35,102 @@ jobs:
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/multi-env-cicd
-        tags: |
-          type=ref,event=branch
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/multi-env-cicd
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy-dev:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-    - name: Checkout GitOps repo
-      uses: actions/checkout@v4
-      with:
-        repository: gajjarvatsall/multi-env-gitops
-        token: ${{ secrets.GITOPS_TOKEN }}
-        path: gitops
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: gajjarvatsall/multi-env-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
 
-    - name: Update dev environment
-      run: |
-        cd gitops
-        echo "Current dev values:"
-        cat environments/dev/values.yaml
-        
-        # Extract just the image tag from the full output
-        IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
-        echo "Using image tag: $IMAGE_TAG"
-        
-        # Update image tag in dev environment
-        sed -i "s|image: .*|image: $IMAGE_TAG|" environments/dev/values.yaml
-        
-        echo "Updated dev values:"
-        cat environments/dev/values.yaml
-        
-        # Commit changes
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Update dev environment to $IMAGE_TAG" || echo "No changes to commit"
-        git push
+      - name: Update dev environment
+        run: |
+          cd gitops
+          echo "Current dev values:"
+          cat environments/dev/values.yaml
+
+          # Extract just the image tag from the full output
+          IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
+          echo "Using image tag: $IMAGE_TAG"
+
+          # Update image tag in dev environment
+          sed -i "s|image: .*|image: $IMAGE_TAG|" environments/dev/values.yaml
+
+          echo "Updated dev values:"
+          cat environments/dev/values.yaml
+
+          # Commit changes
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update dev environment to $IMAGE_TAG" || echo "No changes to commit"
+          git push
 
   deploy-staging:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-    - name: Checkout GitOps repo
-      uses: actions/checkout@v4
-      with:
-        repository: gajjarvatsall/multi-env-gitops
-        token: ${{ secrets.GITOPS_TOKEN }}
-        path: gitops
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: gajjarvatsall/multi-env-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
 
-    - name: Update staging environment
-      run: |
-        cd gitops
-        echo "Current staging values:"
-        cat environments/staging/values.yaml
-        
-        # Extract just the image tag from the full output
-        IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
-        echo "Using image tag: $IMAGE_TAG"
-        
-        # Update image tag in staging environment
-        sed -i "s|image: .*|image: $IMAGE_TAG|" environments/staging/values.yaml
-        
-        echo "Updated staging values:"
-        cat environments/staging/values.yaml
-        
-        # Commit changes
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Update staging environment to $IMAGE_TAG" || echo "No changes to commit"
-        git push
+      - name: Update staging environment
+        run: |
+          cd gitops
+          echo "Current staging values:"
+          cat environments/staging/values.yaml
+
+          # Extract just the image tag from the full output
+          IMAGE_TAG=$(echo "${{ needs.build.outputs.image-tag }}" | head -n1)
+          echo "Using image tag: $IMAGE_TAG"
+
+          # Update image tag in staging environment
+          sed -i "s|image: .*|image: $IMAGE_TAG|" environments/staging/values.yaml
+
+          echo "Updated staging values:"
+          cat environments/staging/values.yaml
+
+          # Commit changes
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update staging environment to $IMAGE_TAG" || echo "No changes to commit"
+          git push
