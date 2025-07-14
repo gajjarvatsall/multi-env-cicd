@@ -5,7 +5,7 @@ const environment = process.env.NODE_ENV || 'development';
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'Hello from CI/CD Pipeline! ,',
+    message: 'Hello from CI/CD Pipeline! , Gitops',
     environment: environment,
     version: process.env.APP_VERSION || '1.0.0',
     timestamp: new Date().toISOString()

@@ -9,7 +9,7 @@ describe('App Tests', () => {
   test('GET / should return welcome message', async () => {
     const response = await request(app).get('/');
     expect(response.status).toBe(200);
-    expect(response.body.message).toBe('Hello from CI/CD Pipeline! ,');
+    expect(response.body.message).toBe('Hello from CI/CD Pipeline! , Gitops');
   });
 
   test('GET /health should return health status', async () => {
