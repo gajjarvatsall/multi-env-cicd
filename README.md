@@ -10,25 +10,7 @@ A comprehensive DevOps project demonstrating modern CI/CD practices with multi-e
 
 This project showcases a production-ready CI/CD pipeline that automatically builds, tests, and deploys a Node.js application across multiple environments using GitOps principles.
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Source Code   │───▶│   GitHub Actions │───▶│   Docker Hub    │
-│   (This Repo)   │    │   CI/CD Pipeline │    │   Image Registry│
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │   GitOps Repo    │
-                       │ (Config Updates) │
-                       └──────────────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │   Kubernetes     │
-                       │   Deployments    │
-                       │  (Dev/Staging)   │
-                       └──────────────────┘
-```
+<img width="1469" height="682" alt="Screenshot 2025-08-05 at 2 54 57 PM" src="https://github.com/user-attachments/assets/b459f6f4-742a-4675-87b9-1aca3a1249bf" />
 
 ## 🚀 Features
 
